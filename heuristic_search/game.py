@@ -4,26 +4,41 @@ from collections import deque
 class Game:
     def __init__(self, n: int):
         self.n = n
-        self.start = [0, 0]
-        self.end = [n - 1, n - 1]
+        self.start = (0, 0)
+        self.end = (n - 1, n - 1)
         self.map = [[0] * n for _ in range(n)]
         self.map[0][0] = 'S'
         self.map[self.n - 1][self.n - 1] = 'E'
+        self.obstacles = set()
     
-    def reset_board(self):
+    def clear_board(self):
         self.map = [[0] * self.n for _ in range(self.n)]
         self.map[0][0] = 'S'
         self.map[self.n - 1][self.n - 1] = 'E'
 
+    def reset_board(self):
+        n = self.n
+        for i in range(n):
+            for j in range(n):
+                if self.map[i][j] == 'P':
+                    self.map[i][j] = 0
+    
+    def mark_solution(self, solution: list):
+        self.reset_board()
+        for point in solution:
+            if self.map[point[0]][point[1]] not in ['S', 'E']:
+                self.map[point[0]][point[1]] = 'P'
+
     def generate_obstacles(self, obstacles_count: int):
-        if obstacles_count > self.n * self.n * 0.5:
-            print('Number of obstacles should not exceed 50% of the board')
-            return
+        # if obstacles_count > self.n * self.n * 0.5:
+        #     print('Number of obstacles should not exceed 50% of the board')
+        #     return
+        self.reset_board()
         
         valid = False
         while not valid:
             obstacle_positions = set()
-            self.reset_board()
+            self.clear_board()
             while len(obstacle_positions) < obstacles_count:
                 x = random.randint(0, self.n - 1)
                 y = random.randint(0, self.n - 1)
@@ -34,6 +49,7 @@ class Game:
                 self.map[x][y] = 1
             
             valid = self.is_path_exists()
+            self.obstacles = obstacle_positions
 
     def is_path_exists(self):
         directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]

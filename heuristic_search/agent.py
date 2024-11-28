@@ -8,7 +8,7 @@ class Agent:
         self.moves = [(0, 1), (1, 0), (0, -1), (-1, 0)]
         self.solution = []
 
-    def reset(self):
+    def reset_solution(self):
         self.solution = []
 
     def heuristic(self, option: int, game: Game, move=None):
@@ -45,7 +45,7 @@ class Agent:
                 game.map[point[0]][point[1]] = 'P'
 
     def bfs(self, game: Game):
-        self.reset()
+        self.reset_solution()
         n = game.n
         visited = [[False for _ in range(n)] for _ in range(n)]
         queue = deque([(0, 0)])
@@ -73,7 +73,7 @@ class Agent:
         return False
     
     def dfs(self, game: Game):
-        self.reset()
+        self.reset_solution()
         n = game.n
         visited = [[False for _ in range(n)] for _ in range(n)]
         parent = {}
@@ -100,7 +100,7 @@ class Agent:
             return True
 
     def best_first_search(self, game: Game, heuristic_option=1):
-        self.reset()
+        self.reset_solution()
         n = game.n
         visited = [[False for _ in range(n)] for _ in range(n)]
         priority_queue = []
@@ -133,7 +133,7 @@ class Agent:
         return False
     
     def a_star_search(self, game: Game, heuristic_option=1):
-        self.reset()
+        self.reset_solution()
         n = game.n
         visited = [[False for _ in range(n)] for _ in range(n)]
         priority_queue = []
@@ -181,5 +181,6 @@ if __name__ == "__main__":
     #     print(move, agent.distance_to_obstacle(game, move))
     result = agent.best_first_search(game, heuristic_option=1)
     game.visualize()
+    game.reset_board()
     agent.a_star_search(game)
     game.visualize()
