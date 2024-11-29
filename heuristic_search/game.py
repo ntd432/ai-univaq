@@ -87,8 +87,3 @@ class Game:
                     print(' - ', end='')
             print('|')
         print('---' * self.n + '--')
-
-if __name__ == "__main__":
-    game = Game(10)
-    game.generate_obstacles(10)
-    game.visualize()

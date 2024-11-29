@@ -1,6 +1,6 @@
 from game import Game
 from collections import deque
-import heapq
+import heapq, math
 
 class Agent:
     def __init__(self):
@@ -17,10 +17,14 @@ class Agent:
         # -distance to the nearest obstacle
         if option == 0:
             return -self.distance_to_obstacle(game, move) - sum(move)
-        # Manhattan distance
+        # Manhattan distance to the ending point
         if option == 1:
             x, y = self.state
             return abs(x - (n - 1)) + abs(y - (n - 1)) 
+        # Euclidean distance to the ending point
+        if option == 2:
+            x, y = self.state
+            return math.sqrt((x - (n - 1))**2 + (y - (n - 1))**2)
 
     def distance_to_obstacle(self, game: Game, move: tuple):
         if move == None or game == None:
@@ -102,7 +106,7 @@ class Agent:
         if dfs(0, 0):
             return True
 
-    def best_first_search(self, game: Game, heuristic_option=1):
+    def best_first_search(self, game: Game, heuristic_option=0):
         self.reset_solution()
         n = game.n
         visited = [[False for _ in range(n)] for _ in range(n)]
@@ -174,18 +178,3 @@ class Agent:
                         heapq.heappush(priority_queue, (f_score, g_score, nx, ny))
                         parent[(nx, ny)] = (x, y)
         return False
-
-
-if __name__ == "__main__":
-    game = Game(10)
-    game.generate_obstacles(40)
-    game.visualize()
-    agent = Agent()
-    # agent.state = (5, 5)
-    # for move in agent.moves:
-    #     print(move, agent.distance_to_obstacle(game, move))
-    result = agent.best_first_search(game, heuristic_option=1)
-    game.visualize()
-    game.reset_board()
-    agent.a_star_search(game)
-    game.visualize()
