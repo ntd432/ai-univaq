@@ -9,13 +9,14 @@ class Agent:
         self.solution = []
 
     def reset_solution(self):
+        self.state = (0, 0)
         self.solution = []
 
     def heuristic(self, option: int, game: Game, move=None):
         n = game.n
         # -distance to the nearest obstacle
         if option == 0:
-            return -self.distance_to_obstacle(game, move)
+            return -self.distance_to_obstacle(game, move) - sum(move)
         # Manhattan distance
         if option == 1:
             x, y = self.state
@@ -31,7 +32,7 @@ class Agent:
         
         while True:
             x, y = x + dx, y + dy
-            if game.map[x][y] == 'E':
+            if 0 <= x < n and 0 <= y < n and game.map[x][y] == 'E':
                 return float('inf')
             if 0 <= x < n and 0 <= y < n and game.map[x][y] != 1:
                 count += 1
@@ -53,6 +54,7 @@ class Agent:
 
         while queue:
             x, y = queue.popleft()
+            self.state = (x, y)
 
             if (x, y) == (n - 1, n - 1):
                 current = (x, y)
@@ -79,6 +81,7 @@ class Agent:
         parent = {}
 
         def dfs(x, y):
+            self.state = (x, y)
             if (x, y) == (n - 1, n - 1):
                 self.solution.append((x, y))
                 self.mark_solution(game)
@@ -109,6 +112,7 @@ class Agent:
 
         while priority_queue:
             _, x, y = heapq.heappop(priority_queue)
+            self.state = (x, y)
 
             if visited[x][y]:
                 continue
@@ -132,7 +136,7 @@ class Agent:
                         parent[(nx, ny)] = (x, y)
         return False
     
-    def a_star_search(self, game: Game, heuristic_option=1):
+    def a_star_search(self, game: Game, heuristic_option=0):
         self.reset_solution()
         n = game.n
         visited = [[False for _ in range(n)] for _ in range(n)]
@@ -143,6 +147,7 @@ class Agent:
 
         while priority_queue:
             f, g, x, y = heapq.heappop(priority_queue)
+            self.state = (x, y)
 
             if visited[x][y]:
                 continue
