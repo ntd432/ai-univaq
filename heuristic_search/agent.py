@@ -17,14 +17,18 @@ class Agent:
         # -distance to the nearest obstacle
         if option == 0:
             return -self.distance_to_obstacle(game, move) - sum(move)
-        # Manhattan distance to the ending point
+        # Manhattan distance of new state to the ending point
         if option == 1:
             x, y = self.state
-            return abs(x - (n - 1)) + abs(y - (n - 1)) 
-        # Euclidean distance to the ending point
+            dx, dy = move
+            nx, ny = x + dx, y + dy
+            return abs(nx - (n - 1)) + abs(ny - (n - 1)) 
+        # Euclidean distance of new state to the ending point
         if option == 2:
             x, y = self.state
-            return math.sqrt((x - (n - 1))**2 + (y - (n - 1))**2)
+            dx, dy = move
+            nx, ny = x + dx, y + dy
+            return math.sqrt((nx - (n - 1))**2 + (ny - (n - 1))**2)
 
     def distance_to_obstacle(self, game: Game, move: tuple):
         if move == None or game == None:
