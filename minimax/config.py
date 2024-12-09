@@ -1,3 +1,9 @@
+DEFAULT_DEPTH = 3
+DATA = "data.csv"
+LAYERS_SIZE=[1, 64, 32, 16, 1]
+DATA_2 = "data2.csv"
+LAYERS_SIZE_2=[4, 64, 32, 16, 1]
+NUMBER_OF_GAMES=1
 
 BOARD_SCORES = {
     "PAWN": 1,

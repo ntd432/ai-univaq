@@ -3,3 +3,4 @@ This repository is dedicated for developing assignments of AI course from Univer
 
 This course is taken under the first semester of the Erasmus Mundus Master's Programme Software Engineers for Green Deal (SE4GD). For more information click [here](https://se4gd.lutsoftware.com/).
 
+Shout out to Alexander Nikulin and his repository [Chess Minimax](https://github.com/Howuhh/chess_minimax/tree/master).
