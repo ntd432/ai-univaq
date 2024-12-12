@@ -31,8 +31,8 @@ def write_to_csv(input_value: float, output_value: float):
     writer.writerow([input_value, output_value])
     print(f"Added row: {input_value}, {output_value}")
 
-def write_to_csv(row: list):
-    if row == [100] * len(row):
+def write_to_csv_list(row: list):
+    if row == [0] * len(row) or row == [100] * len(row):
         return
     # Write the data row
     writer_2.writerow(row)
@@ -61,7 +61,8 @@ class RandomPlayer(Player):
         return move
 
 class MiniMaxPlayer(Player):
-    def __init__(self, player, game: Game=ChessGame(), depth=DEFAULT_DEPTH, choice_limit=-1, verbose=False, generate_data=False):
+    def __init__(self, player, game: Game=ChessGame(), depth=DEFAULT_DEPTH, 
+                 choice_limit=-1, verbose=False, generate_data=False):
         super().__init__(player, game, f"minimax, depth = {depth}, limit = {choice_limit}")
         self.depth = depth
         self.verbose = verbose
@@ -155,6 +156,8 @@ class MiniMaxPlayerWithRegressor(Player):
             return white_opening
 
         moves = self.game.sorted_moves_prediction(board, player, self.limit)
+        print(moves)
+        return moves[0][::-1]
 
         if board.turn == player:
             maxScore, bestMove = -inf, None
@@ -201,6 +204,7 @@ class MiniMaxPlayerWithRegressor(Player):
 
     def move(self, board: Board) -> str:
         best_move = self._minimax(board, self.player, self.depth)
+        print(best_move)
         if type(best_move) == str:
             return best_move
         return best_move[1].uci()
@@ -236,7 +240,7 @@ class MiniMaxPlayerWithHFunction(Player):
                 score = self._minimax(test_board, not player, depth - 1, alpha, beta)
                 # print('score', score, 'H' + str(DEFAULT_DEPTH - depth), h_value, depth)
                 if self.generate_data and depth == DEFAULT_DEPTH:
-                    write_to_csv(h_value + [score[0]])
+                    write_to_csv_list(h_value + [score[0]])
                 
                 if self.verbose:
                     log.info(f"{self.game.turn_side(test_board)}, M{len(moves)}, D{depth}:{move} - SCORE: {score}")
@@ -260,7 +264,7 @@ class MiniMaxPlayerWithHFunction(Player):
                 score = self._minimax(test_board, player, depth - 1, alpha, beta)
                 # print('score', score, 'H' + str(DEFAULT_DEPTH - depth), h_value, depth)
                 if self.generate_data and depth == DEFAULT_DEPTH:
-                    write_to_csv(h_value + [score[0]])
+                    write_to_csv_list(h_value + [score[0]])
 
                 if self.verbose:
                     log.info(f"{self.game.turn_side(test_board)}, M{len(moves)}, D{depth}:{move} - SCORE: {score}")
@@ -301,6 +305,7 @@ class MiniMaxPlayerWithHFunctionPrediction(Player):
             return white_opening
 
         moves = self.game.sorted_moves_with_h_function_prediction(board, player, self.limit)
+        return moves[0][::-1]
 
         if board.turn == player:
             maxScore, bestMove = -inf, None
@@ -356,7 +361,7 @@ class MiniMaxPlayerWithHFunctionPrediction(Player):
 if __name__ == "__main__":
     test_board = Board()
     chess_game = ChessGame()
-    test_bot = MiniMaxPlayer(player=True, game=chess_game, verbose=False)
+    test_bot = MiniMaxPlayerWithRegressor(player=True, game=chess_game, verbose=False)
 
     start_time = time()
     print(test_bot._minimax(test_board, True, 5))

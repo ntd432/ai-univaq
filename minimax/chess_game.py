@@ -1,7 +1,7 @@
 import chess
 import torch
 
-from random import random
+from random import random, shuffle
 from game import Game
 from chess import Board
 from typing import List
@@ -20,11 +20,12 @@ class ChessGame(Game):
         self.model = FlexibleMLP(LAYERS_SIZE)
         self.second_model = FlexibleMLP(LAYERS_SIZE_2)
         self.model.load_state_dict(torch.load("model.pth"))
+        self.second_model.load_state_dict(torch.load("model_2.pth"))
     
     def predict_h(self, h0):
         return self.model(torch.tensor([[float(h0)]]))[0][0].item()
     
-    def predict_h(self, h: list):
+    def predict_h_list(self, h: list):
         return self.second_model(torch.tensor([[float(i) for i in h]]))[0][0].item()
     
     def game_over(self, board: Board, claim_draw: bool=False):
@@ -115,7 +116,10 @@ class ChessGame(Game):
         for move in moves:
             copy_board = board.copy()
             copy_board.push(move)
-            scores.append(self.predict_h(self.game_score(copy_board, player)))
+            piece = board.piece_type_at(NAME_TO_SQUARE[self.square_name(move)])
+            if piece == None:
+                piece = 0.5
+            scores.append(piece * self.predict_h(self.game_score(copy_board, player)))
 
         moves = sorted(zip(moves, scores), key=lambda x: x[1], reverse=True)
         return moves if limit == -1 else moves[:limit]
@@ -137,7 +141,7 @@ class ChessGame(Game):
         for move in moves:
             copy_board = board.copy()
             copy_board.push(move)
-            scores.append(self.predict_h(self.game_score_with_h(copy_board, player)))
+            scores.append(self.predict_h_list(self.game_score_with_h(copy_board, player)))
 
         moves = sorted(zip(moves, scores), key=lambda x: x[1], reverse=True)
         return moves if limit == -1 else moves[:limit]
@@ -219,8 +223,7 @@ class ChessGame(Game):
         return total_score
 
     def square_name(self, move):
-        return move.uci()[:2]
-
+        return move.uci()[2:]
 
     def turn_side(self, board):
         side = "White" if board.turn == True else "Black"
